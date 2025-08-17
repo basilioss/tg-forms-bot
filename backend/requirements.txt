@@ -1,0 +1,6 @@
+fastapi==0.115.0
+uvicorn==0.30.5
+python-telegram-bot
+SQLAlchemy==2.0.32
+pydantic==2.8.2
+python-dotenv
