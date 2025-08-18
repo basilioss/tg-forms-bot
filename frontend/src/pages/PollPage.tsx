@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import '@telegram-apps/telegram-ui/dist/styles.css';
+import { AppRoot, List, Section, Cell, Selectable, Button, Radio } from '@telegram-apps/telegram-ui';
+
 
 const API = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
 
@@ -74,94 +77,46 @@ export default function PollPage() {
   }
 
   return (
-    <div
+  <AppRoot>
+    <List
       style={{
-        maxWidth: 500,
-        margin: '16px auto',
-        padding: 16,
-        borderRadius: 12,
-        background: 'var(--tg-theme-bg-color, #fff)',
-        color: 'var(--tg-theme-text-color, #000)',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-        fontFamily: 'system-ui, sans-serif',
+        background: 'var(--tgui--secondary_bg_color)',
+        padding: 10
       }}
     >
-      {!poll ? (
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>
-          {status || 'Loading...'}
-        </h2>
-      ) : (
-        <>
-          <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
-            {poll.question}
-          </h2>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {poll.options.map((o: any) => (
-              <label
-                key={o.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  cursor: 'pointer',
-                  padding: '8px 12px',
-                  borderRadius: 8,
-                  background:
-                    selected === o.id
-                      ? 'var(--tg-theme-button-color, #3390ec)'
-                      : 'rgba(0,0,0,0.05)',
-                  color:
-                    selected === o.id
-                      ? 'var(--tg-theme-button-text-color, #fff)'
-                      : 'inherit',
-                }}
-              >
-                <input
-                  type="radio"
-                  name="opt"
-                  value={o.id}
-                  checked={selected === o.id}
-                  onChange={() => setSelected(o.id)}
-                  style={{ display: 'none' }}
-                />
-                <span>{o.text}</span>
-              </label>
-            ))}
-          </div>
-
-          <button
-            onClick={submit}
-            disabled={selected == null}
-            style={{
-              marginTop: 16,
-              width: '100%',
-              padding: '12px 16px',
-              border: 'none',
-              borderRadius: 8,
-              background:
-                selected == null
-                  ? 'rgba(0,0,0,0.1)'
-                  : 'var(--tg-theme-button-color, #3390ec)',
-              color:
-                selected == null
-                  ? 'rgba(0,0,0,0.4)'
-                  : 'var(--tg-theme-button-text-color, #fff)',
-              fontSize: 16,
-              fontWeight: 500,
-              cursor: selected == null ? 'not-allowed' : 'pointer',
-            }}
+      <Section header={poll?.question || "Loading..."}>
+        {poll?.options?.map((o: any) => (
+          <Cell
+            key={o.id}
+            Component="label"
+            before={
+              <Radio
+                name="poll"
+                value={o.id}
+                checked={selected === o.id}
+                onChange={() => setSelected(o.id)}
+              />
+            }
+            multiline
           >
-            Submit vote
-          </button>
+            {o.text}
+          </Cell>
+        ))}
+      </Section>
 
-          {status && (
-            <div style={{ marginTop: 8, fontSize: 14, opacity: 0.8 }}>
-              {status}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+      <Section>
+        <Button
+          mode="filled"
+          size="l"
+          stretched
+          disabled={!selected}
+          onClick={submit}
+        >
+          Submit vote
+        </Button>
+        {status && <Cell multiline>{status}</Cell>}
+      </Section>
+    </List>
+  </AppRoot>
   );
 }
