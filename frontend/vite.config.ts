@@ -31,6 +31,15 @@ export default defineConfig({
   server: {
     // Exposes your dev server and makes it accessible for the devices in the same network.
     host: true,
+    allowedHosts: true,
+    proxy: {
+      // Proxy /api requests to the local backend
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });
 
