@@ -32,8 +32,7 @@ async def newpoll(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     db = SessionLocal()
     poll = crud.create_poll(db, question, options)
-    BOT_USERNAME = "t_forms_bot"
-    link = f"https://t.me/{BOT_USERNAME}?startapp=poll{poll.id}"
+    link = f"https://t.me/FormsTelegramBot?startapp=poll{poll.id}"
     await update.message.reply_text(f"Poll created: {poll.question}\nVote here: {link}\nPoll ID: {poll.id}")
 
 async def results(update: Update, context: ContextTypes.DEFAULT_TYPE):
