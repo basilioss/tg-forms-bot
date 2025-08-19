@@ -43,11 +43,11 @@ export default function StartParamRouter() {
     if (value) {
       console.log('[StartParamRouter] Detected start param:', value, debug);
 
-      if (value.startsWith('poll')) {
-        const id = value.slice(4);
+      if (value.startsWith('form_')) {
+        const id = value.slice(5);
         nav(`/poll/${id}${location.search}`, { replace: true });
-      } else if (value.startsWith('results')) {
-        const id = value.slice(7);
+      } else if (value.startsWith('responses_')) {
+        const id = value.slice(10);
         nav(`/results/${id}${location.search}`, { replace: true });
       }
     } else {

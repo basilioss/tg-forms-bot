@@ -47,7 +47,7 @@ export default function CreatePollPage() {
 
   const copyPollUrl = () => {
     if (createdPoll) {
-      const url = `https://t.me/FormsTelegramBot?startapp=poll${createdPoll.id}`;
+      const url = `https://t.me/FormsTelegramBot?startapp=form_${createdPoll.id}`;
       navigator.clipboard.writeText(url).then(() => {
         setStatus('📋 PollURL copied to clipboard!');
       }).catch(() => {
@@ -58,7 +58,7 @@ export default function CreatePollPage() {
 
   const copyResponsesUrl = () => {
     if (createdPoll) {
-      const url = `https://t.me/FormsTelegramBot?startapp=results${createdPoll.results_id}`;
+      const url = `https://t.me/FormsTelegramBot?startapp=responses_${createdPoll.results_id}`;
       navigator.clipboard.writeText(url).then(() => {
         setStatus('📋 Responses URL copied to clipboard!');
       }).catch(() => {
