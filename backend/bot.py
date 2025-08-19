@@ -32,7 +32,6 @@ async def newpoll(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     db = SessionLocal()
     poll = crud.create_poll(db, question, options)
-    # link = f"{APP_BASE_URL}/poll/{poll.id}"
     BOT_USERNAME = "t_forms_bot"
     link = f"https://t.me/{BOT_USERNAME}?startapp=poll{poll.id}"
     await update.message.reply_text(f"Poll created: {poll.question}\nVote here: {link}\nPoll ID: {poll.id}")
@@ -42,11 +41,7 @@ async def results(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not args:
         await update.message.reply_text("Usage: /results POLL_ID")
         return
-    try:
-        poll_id = int(args[0])
-    except ValueError:
-        await update.message.reply_text("POLL_ID must be an integer.")
-        return
+    poll_id = args[0].strip()
     db = SessionLocal()
     r = crud.get_results(db, poll_id)
     if not r:

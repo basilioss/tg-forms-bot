@@ -39,11 +39,11 @@ def healthz():
 
 @app.post("/api/polls", response_model=schemas.PollOut)
 def create_poll(poll: schemas.PollCreate, db: Session = Depends(get_db)):
-    if not poll.question.strip() or len(poll.options) < 2:
-        raise HTTPException(status_code=400, detail="Provide question and at least two options.")
+    if not poll.question.strip() or len(poll.options) < 1:
+        raise HTTPException(status_code=400, detail="Provide question and at least one option.")
     options = [o.strip() for o in poll.options if o.strip()]
-    if len(options) < 2:
-        raise HTTPException(status_code=400, detail="Provide question and at least two options.")
+    if len(options) < 1:
+        raise HTTPException(status_code=400, detail="Provide question and at least one option.")
     p = crud.create_poll(db, poll.question.strip(), options)
     return schemas.PollOut(
         id=p.id,
@@ -52,7 +52,7 @@ def create_poll(poll: schemas.PollCreate, db: Session = Depends(get_db)):
     )
 
 @app.get("/api/polls/{poll_id}", response_model=schemas.PollOut)
-def get_poll(poll_id: int, db: Session = Depends(get_db)):
+def get_poll(poll_id: str, db: Session = Depends(get_db)):
     p = crud.get_poll(db, poll_id)
     if not p:
         raise HTTPException(status_code=404, detail="Poll not found")
@@ -63,7 +63,7 @@ def get_poll(poll_id: int, db: Session = Depends(get_db)):
     )
 
 @app.post("/api/polls/{poll_id}/vote")
-def vote(poll_id: int, vote: schemas.VoteCreate, db: Session = Depends(get_db)):
+def vote(poll_id: str, vote: schemas.VoteCreate, db: Session = Depends(get_db)):
     poll = crud.get_poll(db, poll_id)
     if not poll:
         raise HTTPException(status_code=404, detail="Poll not found")
@@ -74,7 +74,7 @@ def vote(poll_id: int, vote: schemas.VoteCreate, db: Session = Depends(get_db)):
     return {"ok": True, "vote_id": v.id}
 
 @app.get("/api/polls/{poll_id}/results", response_model=schemas.ResultsOut)
-def results(poll_id: int, db: Session = Depends(get_db)):
+def results(poll_id: str, db: Session = Depends(get_db)):
     r = crud.get_results(db, poll_id)
     if not r:
         raise HTTPException(status_code=404, detail="Poll not found")

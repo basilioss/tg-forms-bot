@@ -5,17 +5,17 @@ from . import models
 def create_poll(db: Session, question: str, options: list[str]) -> models.Poll:
     poll = models.Poll(question=question)
     db.add(poll)
-    db.flush()
+    db.flush()  # ensures poll.id is available
     for opt_text in options:
         db.add(models.Option(text=opt_text, poll_id=poll.id))
     db.commit()
     db.refresh(poll)
     return poll
 
-def get_poll(db: Session, poll_id: int) -> models.Poll | None:
+def get_poll(db: Session, poll_id: str) -> models.Poll | None:
     return db.get(models.Poll, poll_id)
 
-def create_vote(db: Session, option_id: int, user_id: str | None):
+def create_vote(db: Session, option_id: str, user_id: str | None):
     # Remove previous votes by same user for this poll (simple dedupe)
     if user_id is not None:
         # find poll_id from option
@@ -35,7 +35,7 @@ def create_vote(db: Session, option_id: int, user_id: str | None):
     db.refresh(v)
     return v
 
-def get_results(db: Session, poll_id: int):
+def get_results(db: Session, poll_id: str):
     poll = get_poll(db, poll_id)
     if not poll:
         return None
