@@ -47,6 +47,7 @@ def create_poll(poll: schemas.PollCreate, db: Session = Depends(get_db)):
     p = crud.create_poll(db, poll.question.strip(), options)
     return schemas.PollOut(
         id=p.id,
+        results_id=p.results_id,
         question=p.question,
         options=[schemas.OptionOut.model_validate(o) for o in p.options]
     )
@@ -58,6 +59,7 @@ def get_poll(poll_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Poll not found")
     return schemas.PollOut(
         id=p.id,
+        results_id=p.results_id,
         question=p.question,
         options=[schemas.OptionOut.model_validate(o) for o in p.options]
     )
@@ -73,9 +75,9 @@ def vote(poll_id: str, vote: schemas.VoteCreate, db: Session = Depends(get_db)):
     v = crud.create_vote(db, vote.option_id, vote.user_id)
     return {"ok": True, "vote_id": v.id}
 
-@app.get("/api/polls/{poll_id}/results", response_model=schemas.ResultsOut)
-def results(poll_id: str, db: Session = Depends(get_db)):
-    r = crud.get_results(db, poll_id)
+@app.get("/api/results/{results_id}", response_model=schemas.ResultsOut)
+def results(results_id: str, db: Session = Depends(get_db)):
+    r = crud.get_results(db, results_id)
     if not r:
         raise HTTPException(status_code=404, detail="Poll not found")
     return r

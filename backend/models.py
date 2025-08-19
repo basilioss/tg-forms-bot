@@ -9,6 +9,7 @@ def generate_id():
 class Poll(Base):
     __tablename__ = "polls"
     id = Column(String(20), primary_key=True, default=generate_id, index=True)
+    results_id = Column(String(20), unique=True, default=generate_id, index=True)
     question = Column(String, nullable=False)
     options = relationship("Option", back_populates="poll", cascade="all, delete-orphan")
 

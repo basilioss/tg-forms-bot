@@ -35,8 +35,8 @@ def create_vote(db: Session, option_id: str, user_id: str | None):
     db.refresh(v)
     return v
 
-def get_results(db: Session, poll_id: str):
-    poll = get_poll(db, poll_id)
+def get_results(db: Session, results_id: str):
+    poll = db.query(models.Poll).filter_by(results_id=results_id).first()
     if not poll:
         return None
     results = []
@@ -48,6 +48,7 @@ def get_results(db: Session, poll_id: str):
         })
     return {
         "poll_id": poll.id,
+        "results_id": poll.results_id,
         "question": poll.question,
         "results": results
     }

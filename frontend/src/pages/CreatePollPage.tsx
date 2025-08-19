@@ -58,7 +58,7 @@ export default function CreatePollPage() {
 
   const copyResponsesUrl = () => {
     if (createdPoll) {
-      const url = `https://t.me/FormsTelegramBot?startapp=results${createdPoll.id}`;
+      const url = `https://t.me/FormsTelegramBot?startapp=results${createdPoll.results_id}`;
       navigator.clipboard.writeText(url).then(() => {
         setStatus('📋 Responses URL copied to clipboard!');
       }).catch(() => {

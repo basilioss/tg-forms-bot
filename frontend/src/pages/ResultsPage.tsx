@@ -28,7 +28,7 @@ export default function ResultsPage() {
   const chartRef = useRef<Chart | null>(null);
 
   useEffect(() => {
-    fetch(`${API}/polls/${id}/results`)
+    fetch(`${API}/results/${id}`)
       .then((r) => {
         if (!r.ok) throw new Error("Not found");
         return r.json();

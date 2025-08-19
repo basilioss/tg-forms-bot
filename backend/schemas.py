@@ -12,6 +12,7 @@ class PollCreate(BaseModel):
 
 class PollOut(BaseModel):
     id: str
+    results_id: str
     question: str
     options: List[OptionOut]
     model_config = ConfigDict(from_attributes=True)
@@ -27,5 +28,6 @@ class ResultsItem(BaseModel):
 
 class ResultsOut(BaseModel):
     poll_id: str
+    results_id: str
     question: str
     results: List[ResultsItem]
