@@ -1,6 +1,5 @@
 import type { ComponentType, JSX } from 'react';
 
-import { IndexPage } from '@/pages/IndexPage.tsx';
 import { InitDataPage } from '@/pages/InitDataPage.tsx';
 import StartParamRouter from '@/pages/StartParamRouter.tsx';
 

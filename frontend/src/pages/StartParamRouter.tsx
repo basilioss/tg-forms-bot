@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 function detectStartParam() {
   const debug: Record<string, any> = {};
@@ -51,31 +51,14 @@ export default function StartParamRouter() {
         nav(`/results/${id}${location.search}`, { replace: true });
       }
     } else {
+      nav(`/create/`);
       console.warn('[StartParamRouter] No start param found', debug);
     }
   }, [nav, location.search]);
 
   return (
     <div className="container">
-      <h1 className="text-2xl font-bold mb-3">Poll Bot Web</h1>
-      <div className="card space-y-2">
-        <p>Create polls via Telegram:</p>
-        <code className="block p-3 bg-black/40 rounded">
-          /newpoll Best color? | Red | Blue | Green
-        </code>
-        <p>
-          Then open the link the bot sends, like <code>/poll/1</code> to vote.
-        </p>
-        <ul className="list-disc ml-6">
-          <li>
-            <code>/poll/&lt;id&gt;</code> – voting page
-          </li>
-          <li>
-            <code>/results/&lt;id&gt;</code> – results chart
-          </li>
-        </ul>
-      </div>
+      <h1>Poll Bot Web</h1>
     </div>
   );
 }
-
