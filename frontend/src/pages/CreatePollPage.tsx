@@ -45,28 +45,6 @@ export default function CreatePollPage() {
     };
   }, [navigate]);
 
-  const copyPollUrl = () => {
-    if (createdPoll) {
-      const url = `https://t.me/FormsTelegramBot?startapp=form_${createdPoll.id}`;
-      navigator.clipboard.writeText(url).then(() => {
-        setStatus('📋 PollURL copied to clipboard!');
-      }).catch(() => {
-        setStatus('❌ Failed to copy URL');
-      });
-    }
-  };
-
-  const copyResponsesUrl = () => {
-    if (createdPoll) {
-      const url = `https://t.me/FormsTelegramBot?startapp=responses_${createdPoll.results_id}`;
-      navigator.clipboard.writeText(url).then(() => {
-        setStatus('📋 Responses URL copied to clipboard!');
-      }).catch(() => {
-        setStatus('❌ Failed to copy URL');
-      });
-    }
-  };
-
   const removeOption = (index: number) => {
     if (options.length > 1) {
       setOptions(prev => prev.filter((_, i) => i !== index));
@@ -125,8 +103,17 @@ export default function CreatePollPage() {
       }
 
       const poll = await response.json();
-      setStatus('✅ Poll created successfully!');
       setCreatedPoll(poll);
+
+      const tg = (window as any)?.Telegram?.WebApp;
+      if (tg) {
+        const url = "https://t.me/FormsTelegramBot?startapp"
+        tg.sendData(`
+✅ Form created successfully!
+
+📄 View Form: ${url}=form_${poll.id}
+📊 View Responses: ${url}=responses_${poll.results_id}`);
+      }
     } catch (error) {
       setStatus(`❌ Error: ${error.message}`);
     } finally {
@@ -195,47 +182,15 @@ export default function CreatePollPage() {
           ))}
         </Section>
 
-        {!createdPoll ? (
-          <Button
-            mode="filled"
-            size="l"
-            stretched
-            disabled={!isFormValid() || isSubmitting}
-            onClick={handleSubmit}
-          >
-            {isSubmitting ? 'Creating Poll...' : 'Create Poll'}
-          </Button>
-        ) : (
-          <>
-            <Button
-              mode="filled"
-              size="l"
-              stretched
-              onClick={() => navigate(`/poll/${createdPoll.id}`)}
-              style={{ marginBottom: '8px' }}
-            >
-              📊 View Poll
-            </Button>
-            <Button
-              mode="outline"
-              size="l"
-              stretched
-              onClick={copyPollUrl}
-              style={{ marginBottom: '8px' }}
-            >
-              🔗 Copy Poll URL
-            </Button>
-            <Button
-              mode="outline"
-              size="l"
-              stretched
-              onClick={copyResponsesUrl}
-              style={{ marginBottom: '8px' }}
-            >
-              📬 Copy Responses URL
-            </Button>
-          </>
-        )}
+        <Button
+          mode="filled"
+          size="l"
+          stretched
+          disabled={!isFormValid() || isSubmitting}
+          onClick={handleSubmit}
+        >
+          {isSubmitting ? 'Creating Poll...' : 'Create Poll'}
+        </Button>
         
         {status && (
           <Text style={{ textAlign: 'center', marginTop: '8px' }}>

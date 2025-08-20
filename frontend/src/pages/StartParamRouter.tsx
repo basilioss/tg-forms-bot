@@ -49,9 +49,10 @@ export default function StartParamRouter() {
       } else if (value.startsWith('responses_')) {
         const id = value.slice(10);
         nav(`/results/${id}${location.search}`, { replace: true });
+      } else if (value.startsWith('create')) {
+        nav(`/create/`);
       }
     } else {
-      nav(`/create/`);
       console.warn('[StartParamRouter] No start param found', debug);
     }
   }, [nav, location.search]);

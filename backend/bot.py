@@ -5,17 +5,25 @@ from telegram import Update
 from telegram.ext import Application, ApplicationBuilder, CommandHandler, ContextTypes
 from .db import SessionLocal, Base, engine
 from . import crud
+from telegram.ext import MessageHandler, filters
+from telegram import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:5173")
-
 Base.metadata.create_all(bind=engine)
 
+async def on_webapp_data(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    data = update.effective_message.web_app_data.data
+    await update.message.reply_text(f"{data}")
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyboard = [
+        [KeyboardButton("Create", web_app=WebAppInfo(url=f"{APP_BASE_URL}/#/create"))]
+    ]
     await update.message.reply_text(
-        "Hi! Create a poll with:\n/newpoll Question? | Option A | Option B\n"
-        "Get results with:\n/results POLL_ID"
+        'Welcome! Click "Create" button to get started',
+        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
 
 async def newpoll(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -67,6 +75,7 @@ def build_app() -> Application:
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("newpoll", newpoll))
     app.add_handler(CommandHandler("results", results))
+    app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, on_webapp_data))
     return app
 
 async def run_bot():
