@@ -6,28 +6,27 @@ import secrets, base64
 def generate_id():
     return base64.urlsafe_b64encode(secrets.token_bytes(8)).decode("utf-8").rstrip("=")
 
-class Poll(Base):
-    __tablename__ = "polls"
+class Form(Base):
+    __tablename__ = "forms"
     id = Column(String(20), primary_key=True, default=generate_id, index=True)
-    results_id = Column(String(20), unique=True, default=generate_id, index=True)
+    responses_id = Column(String(20), unique=True, default=generate_id, index=True)
     question = Column(String, nullable=False)
-    options = relationship("Option", back_populates="poll", cascade="all, delete-orphan")
+    options = relationship("Option", back_populates="form", cascade="all, delete-orphan")
 
 class Option(Base):
     __tablename__ = "options"
     id = Column(String(20), primary_key=True, default=generate_id, index=True)
     text = Column(String, nullable=False)
-    poll_id = Column(String(20), ForeignKey("polls.id", ondelete="CASCADE"), nullable=False, index=True)
-    poll = relationship("Poll", back_populates="options")
-    votes = relationship("Vote", back_populates="option", cascade="all, delete-orphan")
+    form_id = Column(String(20), ForeignKey("forms.id", ondelete="CASCADE"), nullable=False, index=True)
+    form = relationship("Form", back_populates="options")
+    responses = relationship("Response", back_populates="option", cascade="all, delete-orphan")
 
-class Vote(Base):
-    __tablename__ = "votes"
+class Response(Base):
+    __tablename__ = "responses"
     id = Column(String(20), primary_key=True, default=generate_id, index=True)
     option_id = Column(String(20), ForeignKey("options.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(String, nullable=True, index=True)  # Telegram user id or anon UUID
-    option = relationship("Option", back_populates="votes")
-
+    option = relationship("Option", back_populates="responses")
     __table_args__ = (
-        UniqueConstraint("option_id", "user_id", name="uq_vote_option_user"),
+        UniqueConstraint("option_id", "user_id", name="uq_response_option_user"),
     )

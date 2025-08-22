@@ -6,28 +6,28 @@ class OptionOut(BaseModel):
     text: str
     model_config = ConfigDict(from_attributes=True)
 
-class PollCreate(BaseModel):
+class FormCreate(BaseModel):
     question: str
     options: List[str]
 
-class PollOut(BaseModel):
+class FormOut(BaseModel):
     id: str
-    results_id: str
+    responses_id: str
     question: str
     options: List[OptionOut]
     model_config = ConfigDict(from_attributes=True)
 
-class VoteCreate(BaseModel):
+class ResponseCreate(BaseModel):
     user_id: Optional[str] = None
     option_id: str
 
-class ResultsItem(BaseModel):
+class ResponseItem(BaseModel):
     option_id: str
     option: str
-    votes: int
+    count: int
 
-class ResultsOut(BaseModel):
-    poll_id: str
-    results_id: str
+class ResponsesOut(BaseModel):
+    form_id: str
+    responses_id: str
     question: str
-    results: List[ResultsItem]
+    responses: List[ResponseItem]

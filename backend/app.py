@@ -3,14 +3,13 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
-
 from .db import Base, engine, SessionLocal
 from . import crud, models, schemas
 
 load_dotenv()
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Poll Bot API", version="0.1.0")
+app = FastAPI(title="Forms Bot API", version="0.2.0")
 
 # Allow local dev frontends (Vite) and simple deployments
 origins = [
@@ -37,47 +36,44 @@ def get_db():
 def healthz():
     return {"ok": True}
 
-@app.post("/api/polls", response_model=schemas.PollOut)
-def create_poll(poll: schemas.PollCreate, db: Session = Depends(get_db)):
-    if not poll.question.strip() or len(poll.options) < 1:
+@app.post("/api/forms", response_model=schemas.FormOut)
+def create_form(form: schemas.FormCreate, db: Session = Depends(get_db)):
+    if not form.question.strip() or len(form.options) < 1:
         raise HTTPException(status_code=400, detail="Provide question and at least one option.")
-    options = [o.strip() for o in poll.options if o.strip()]
-    if len(options) < 1:
-        raise HTTPException(status_code=400, detail="Provide question and at least one option.")
-    p = crud.create_poll(db, poll.question.strip(), options)
-    return schemas.PollOut(
-        id=p.id,
-        results_id=p.results_id,
-        question=p.question,
-        options=[schemas.OptionOut.model_validate(o) for o in p.options]
+    options = [o.strip() for o in form.options if o.strip()]
+    f = crud.create_form(db, form.question.strip(), options)
+    return schemas.FormOut(
+        id=f.id,
+        responses_id=f.responses_id,
+        question=f.question,
+        options=[schemas.OptionOut.model_validate(o) for o in f.options]
     )
 
-@app.get("/api/polls/{poll_id}", response_model=schemas.PollOut)
-def get_poll(poll_id: str, db: Session = Depends(get_db)):
-    p = crud.get_poll(db, poll_id)
-    if not p:
-        raise HTTPException(status_code=404, detail="Poll not found")
-    return schemas.PollOut(
-        id=p.id,
-        results_id=p.results_id,
-        question=p.question,
-        options=[schemas.OptionOut.model_validate(o) for o in p.options]
+@app.get("/api/forms/{form_id}", response_model=schemas.FormOut)
+def get_form(form_id: str, db: Session = Depends(get_db)):
+    f = crud.get_form(db, form_id)
+    if not f:
+        raise HTTPException(status_code=404, detail="Form not found")
+    return schemas.FormOut(
+        id=f.id,
+        responses_id=f.responses_id,
+        question=f.question,
+        options=[schemas.OptionOut.model_validate(o) for o in f.options]
     )
 
-@app.post("/api/polls/{poll_id}/vote")
-def vote(poll_id: str, vote: schemas.VoteCreate, db: Session = Depends(get_db)):
-    poll = crud.get_poll(db, poll_id)
-    if not poll:
-        raise HTTPException(status_code=404, detail="Poll not found")
-    # ensure option belongs to poll
-    if vote.option_id not in [o.id for o in poll.options]:
-        raise HTTPException(status_code=400, detail="Option does not belong to poll")
-    v = crud.create_vote(db, vote.option_id, vote.user_id)
-    return {"ok": True, "vote_id": v.id}
+@app.post("/api/forms/{form_id}/response")
+def submit_response(form_id: str, response: schemas.ResponseCreate, db: Session = Depends(get_db)):
+    form = crud.get_form(db, form_id)
+    if not form:
+        raise HTTPException(status_code=404, detail="Form not found")
+    if response.option_id not in [o.id for o in form.options]:
+        raise HTTPException(status_code=400, detail="Option does not belong to form")
+    r = crud.create_response(db, response.option_id, response.user_id)
+    return {"ok": True, "response_id": r.id}
 
-@app.get("/api/results/{results_id}", response_model=schemas.ResultsOut)
-def results(results_id: str, db: Session = Depends(get_db)):
-    r = crud.get_results(db, results_id)
+@app.get("/api/responses/{responses_id}", response_model=schemas.ResponsesOut)
+def get_responses(responses_id: str, db: Session = Depends(get_db)):
+    r = crud.get_responses(db, responses_id)
     if not r:
-        raise HTTPException(status_code=404, detail="Poll not found")
+        raise HTTPException(status_code=404, detail="Form not found")
     return r

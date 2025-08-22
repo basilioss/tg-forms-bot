@@ -21,14 +21,14 @@ Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip, L
 
 const API = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
 
-export default function ResultsPage() {
+export default function ResponsesPage() {
   const { id } = useParams();
   const [data, setData] = useState<any>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<Chart | null>(null);
 
   useEffect(() => {
-    fetch(`${API}/results/${id}`)
+    fetch(`${API}/responses/${id}`)
       .then((r) => {
         if (!r.ok) throw new Error("Not found");
         return r.json();
@@ -47,11 +47,11 @@ export default function ResultsPage() {
     chartRef.current = new Chart(ctx, {
       type: "bar",
       data: {
-        labels: data.results.map((r: any) => r.option),
+        labels: data.responses.map((r: any) => r.option),
         datasets: [
           {
-            label: "Votes",
-            data: data.results.map((r: any) => r.votes),
+            label: "Responses",
+            data: data.responses.map((r: any) => r.count),
             backgroundColor: "#3390EC", // Telegram blue
           },
         ],
@@ -72,7 +72,7 @@ export default function ResultsPage() {
         <Section header={!data ? "Loading..." : data.question}>
           {!data ? (
             <Cell before={<Spinner />} multiline>
-              Fetching results...
+              Fetching responses...
             </Cell>
           ) : (
             <Cell multiline>
@@ -84,4 +84,3 @@ export default function ResultsPage() {
     </AppRoot>
   );
 }
-
